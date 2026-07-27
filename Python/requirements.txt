@@ -1,0 +1,10 @@
+# Webサーバー機能用
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# 画像処理（Webカメラの読み込みやリサイズ用）
+opencv-python==4.8.1.78
+numpy==1.26.4
+
+# YOLO（最新）
+ultralytics
