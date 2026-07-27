@@ -40,12 +40,18 @@ pip install -r requirements.txt
 python main.py
 ```
 
+### 2. Python側の準備（バックエンド）
+1. Unity Hubからプロジェクトを開く
+   - 推奨バージョン: Unity 6 (6000.3.10f1) 以降
+   - Unity Hubの「プロジェクト」タブから「追加」を選択し、本リポジトリ内の `Unity` フォルダ（またはプロジェクトフォルダ）を指定して開きます。
+3. シーンのセットアップ
+
 
 ## 📡 APIエンドポイント仕様 (Python)
-- 'GET /image':
+- `GET /image`:
   - YOLOの認識枠が描画された最新のカメラフレーム（JPEG画像）を返します。
-- 'GET /status':
+- `GET /status`:
   - 現在の検知状況（JSON形式）を返します。
-  - レスポンス例: '{"is_staying": 0, "stay_time": 0.0}'
-- 'POST /config'（未実装）:
+  - レスポンス例: `{"is_staying": 0, "stay_time": 0.0}`
+- `POST /config`（未実装）:
   - Unity側で設定した判定エリアの頂点座標（ポリゴン）を受け取ります。
