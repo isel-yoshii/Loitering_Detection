@@ -217,6 +217,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+.vscode/
+
 # Unity
 [Ll]ibrary/
 [Tt]emp/
