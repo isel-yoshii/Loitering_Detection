@@ -1,57 +1,53 @@
-# Loitering_Detection
+# Loitering Detection (滞留検知・プロジェクションシステム)
 
+## 概要 (Overview)
+カメラ映像からYOLOを用いて人物を検知・トラッキングし、特定のエリアに一定時間滞留している人（淀み）を検出して、プロジェクターの映像（Unity）にリアルタイムでフィードバックを返すインタラクティブシステムです。
 
-※geminiで生成
+設営をスムーズにするため、ArUcoマーカーを用いた自動キャリブレーション機能を搭載しています。
 
-Webカメラの映像からAI（YOLO）を用いて人物の「居座り（滞在時間）」を検知し、Unity側のクライアントにリアルタイムで共有・可視化するためのシステムです。
+## ✨ 主な機能 (Features)
+- **YOLOによるリアルタイム人物追跡**: 人物の足元座標を計算し、エリア内の滞在時間をカウント。
+- **ハイブリッド・キャリブレーションシステム**:
+  - **Auto (自動)**: Unity側からArUcoマーカーを1秒間投影し、Python側（OpenCV）で検知してプロジェクターとカメラの座標を自動で位置合わせ（ホモグラフィ変換）。
+  - **Manual (手動)**: 自動認識が失敗した場合に備え、操作UIから手動で四隅をクリックして位置合わせできるバックアップ機能を搭載。
+- **Unity × PythonのHTTP連携**: Flaskサーバーを立て、Unity側からカメラ映像（JPEG）や検出ステータスをリアルタイムに取得。
+- **2画面UI設計**: プロジェクター投影用画面と、手元のPC操作用画面（を分離したUI。
 
-## 🛠 システム構成
-- **Python (Backend / AI)**: FlaskによるWeb APIサーバー + YOLO（物体検出・トラッキング）
-- **Unity (Client / UI)**: Webカメラ映像の受信、判定エリアのUI設定（ドラッグ操作）、ステータス受信
+## 🛠 使用技術 (Tech Stack)
+- **Python3**
+  - `ultralytics` (YOLO / 人物検知)
+  - `opencv-python` (ArUcoマーカー検知 / 座標変換)
+  - `Flask` (Unityとの通信用ローカルサーバー)
+- **Unity** (バージョン: 6000.3.2f1)
+  - C#
+  - uGUI (2画面操作パネル)
 
----
+## 💻 ハードウェア要件 (Hardware Requirements)
+- PC (Mac / Windows)
+- Webカメラ
+- プロジェクター
 
-## 🚀 セットアップ手順
+## 🚀 セットアップと実行方法 (How to Run)
 
-### 1. Python側の準備（バックエンド）
-
-Pythonフォルダへ移動し、仮想環境を作成・有効化して必要なライブラリをインストールします。
-
+### 1. Python側の起動
+Python環境にライブラリをインストールし、サーバーを起動します。
 ```bash
-# リポジトリのPythonディレクトリへ移動
-cd Python
-
-# 仮想環境の作成
-python -m venv .venv
-
-# 仮想環境の有効化
-# Mac / Linux の場合:
-source .venv/bin/activate
-# Windows (コマンドプロンプト) の場合:
-# .venv\Scripts\activate
-
-# 必要なライブラリの一括インストール
-pip install -r requirements.txt
+pip install opencv-python ultralytics flask numpy
+python app.py
 ```
+※起動すると `http://127.0.0.1:5050` でFlaskサーバーが立ち上がり、YOLOのトラッキングが裏側で開始されます。
 
-#### Pythonサーバーの起動方法
+### 2. Unity側の起動
+1. Unityエディタでプロジェクトを開きます。
+2. シーンを再生します。
+3. 手元（Display 2）のメニュー画面から、Pythonサーバーと接続されていることを確認します（緑色で「OK」と表示されます）。
 
-```bash
-python main.py
-```
+### 3. キャリブレーションの実行
+1. プロジェクターとカメラを設置します。
+2. Unityのメニューから **「自動キャリブレーション」** ボタンを押します。
+3. 1秒間だけマーカーが投影され、Python側で自動的に投影エリアの四隅が計算されます（成功すると四隅に十字の的が表示されます）。
+4. 自動で合わない場合は、「手動キャリブレーション」から映像の四隅をクリックして設定してください。
 
-### 2. Python側の準備（バックエンド）
-1. Unity Hubからプロジェクトを開く
-   - 推奨バージョン: Unity 6 (6000.3.10f1) 以降
-   - Unity Hubの「プロジェクト」タブから「追加」を選択し、本リポジトリ内の `Unity` フォルダ（またはプロジェクトフォルダ）を指定して開きます。
-3. シーンのセットアップ
-
-
-## 📡 APIエンドポイント仕様 (Python)
-- `GET /image`:
-  - YOLOの認識枠が描画された最新のカメラフレーム（JPEG画像）を返します。
-- `GET /status`:
-  - 現在の検知状況（JSON形式）を返します。
-  - レスポンス例: `{"is_staying": 0, "stay_time": 0.0}`
-- `POST /config`（未実装）:
-  - Unity側で設定した判定エリアの頂点座標（ポリゴン）を受け取ります。
+## 📂 ディレクトリ構成 (Directory Structure)
+- `/Python/` : YOLOのトラッキング、Flaskサーバー、キャリブレーション処理 (`app.py`, `tracker.py`, `calibration.py`)
+- `/Unity/` : Unityのプロジェクトデータ（UIマネージャー、Python通信用スクリプトなど）
