@@ -230,6 +230,12 @@ __marimo__/
 *.csproj
 *.sln
 
+# Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+
 # MemoryCaptures can get large and are generally not useful to commit
 [Mm]emoryCaptures/
 
